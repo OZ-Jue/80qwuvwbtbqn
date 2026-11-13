@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CES 2027 실제 위치 지도</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --bg:#FFFFFF; --ink:#2C2C2A; --muted:#5F5E5A; --line:#D3D1C7;
+    --teal:#0F6E56; --purple:#534AB7; --gray:#5F5E5A;
+    --mono:#A32D2D; --te:#BA7517; --loop:#185FA5; --cs:#3B6D11;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+  .wrap{display:flex;height:100%}
+  #map{flex:1 1 auto;min-height:560px}
+  .panel{flex:0 0 340px;overflow:auto;border-left:1px solid var(--line);padding:14px 16px;font-size:12.5px;line-height:1.55;box-sizing:border-box}
+  .panel h1{font-size:16px;margin:0 0 4px}
+  .panel h2{font-size:13px;margin:14px 0 4px;color:var(--ink)}
+  .panel ul{margin:0;padding-left:16px}
+  .panel li{margin:2px 0}
+  .note{color:var(--muted);font-size:11.5px}
+  .btns{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+  .btns button{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line);background:#F7F6F2;border-radius:4px;cursor:pointer}
+  .key{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:6px}
+  .lbl{background:rgba(255,255,255,.92);border:1px solid #B4B2A9;border-radius:3px;box-shadow:none;padding:1px 5px;font-family:'Malgun Gothic',sans-serif;font-size:11.5px;color:var(--ink);white-space:nowrap}
+  .lbl.xp{border-color:var(--teal);color:var(--teal);font-weight:600}
+  .lbl.hall{border-color:var(--purple);color:#3C3489}
+  .lbl.zone{background:transparent;border:none;font-size:14px;font-weight:600;color:#444441}
+  .lbl.dist{background:#FFF8E8;border-color:#E2C48A;color:#7A4E0A;font-size:11px}
+  .lbl.st{font-size:10.5px;padding:0 4px}
+  .z-lo .lbl.st:not(.keep), .z-lo .lbl.dist{display:none}
+  .leaflet-tooltip-left.lbl::before,.leaflet-tooltip-right.lbl::before,.leaflet-tooltip-top.lbl::before,.leaflet-tooltip-bottom.lbl::before{display:none}
+  @media (max-width:760px){.wrap{flex-direction:column}.panel{flex:none;border-left:none;border-top:1px solid var(--line)}#map{min-height:70vh}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="map"></div>
+  <div class="panel">
+    <h1>CES 2027 전시장 위치와 이동 수단</h1>
+    <div class="note">지도 위쪽 = 북쪽. 배경 지도 = 미국 지질조사국(USGS) The National Map(실제 축척, 오른쪽 위에서 일반 지도·항공사진 전환). 위치 좌표 = OpenStreetMap, 2026-11-12 조회 기준.</div>
+    <div class="btns">
+      <button data-view="lvcc">LVCC 확대</button>
+      <button data-view="ven">Venetian 확대</button>
+      <button data-view="all">전체 보기</button>
+    </div>
+
+    <h2>구역</h2>
+    <ul>
+      <li><b>LVCC 캠퍼스</b> — West·North·Central·South Hall. 북서쪽에 Fontainebleau(CES Foundry), 북동쪽에 Westgate 인접</li>
+      <li><b>Venetian 캠퍼스</b> — LVCC 남서쪽. Venetian Expo(Eureka Park·Innovation Awards), Palazzo·Venetian, 북쪽에 Wynn·Encore</li>
+      <li><b>C Space 캠퍼스</b> — Strip 남쪽 ARIA</li>
+      <li>Xpanner 부스 = <b>West Hall 4569</b></li>
+    </ul>
+
+    <h2>이동 수단 (CES 2027 공식 교통 안내)</h2>
+    <ul>
+      <li><span class="key" style="border-color:var(--te);border-top-style:dashed"></span><b>Tech Express(9번 셔틀)</b> — LVCC Central Plaza(모노레일 역 옆) ↔ Venetian Expo(Sands Ave 연석). 10분 간격. 수–금 7:30–18:30, 토 7:30–16:30</li>
+      <li><span class="dot" style="background:var(--loop)"></span><b>Vegas Loop</b> — LVCC 역 4곳 ↔ Encore·Resorts World·Westgate. 지하 터널이라 역만 표시</li>
+      <li><span class="key" style="border-color:var(--mono)"></span><b>모노레일</b> — 월 7–24시, 화–목 7–02시, 금–일 7–03시. 선은 역 연결(선로 형상 단순화)</li>
+      <li><span class="key" style="border-color:var(--cs);border-top-style:dotted"></span><b>C Space 셔틀</b> — LVCC·Venetian Expo ↔ ARIA. 7번 종일 노선(ARIA) 수–금 7:30–18:30</li>
+      <li><b>호텔 셔틀 1–8번</b> — LVCC West Hall·South Hall 버스장, Venetian Expo 지하 셔틀장(3–8번)</li>
+      <li><b>Fontainebleau</b> — West Hall 셔틀장 하차 후 도보(공식 안내: West Hall이 Fontainebleau·CES Foundry 담당)</li>
+      <li><b>공항 셔틀</b> — 목·금 12–19시, 토 12–17시, 편도 $10. LVCC South 셔틀장·Venetian 지하 셔틀장</li>
+      <li class="note">CES 셔틀 탑승 = CES 2027 배지 필요. 셔틀 운행 기간 1/5(화)–1/9(토)</li>
+    </ul>
+
+    <h2>운영 시간</h2>
+    <ul>
+      <li>전시장: 1/6 10–18시, 1/7·1/8 9–18시, 1/9 9–16시</li>
+      <li>CES Foundry(Fontainebleau): 1/6 10–18시, 1/7·1/8 9–18시 — 1/9 없음</li>
+      <li>C Space(ARIA): 1/6–1/8 9–18시</li>
+    </ul>
+
+    <h2>직선거리 (지도 위 노란 표시)</h2>
+    <ul id="distList"></ul>
+    <div class="note">직선거리이며 실제 도보 경로는 더 김.</div>
+
+    <h2>확인되지 않은 것</h2>
+    <ul class="note">
+      <li>Vegas Loop 요금·운행 시간(공식 안내는 lvcva.com/vegas-loop 참조로만 기재)</li>
+      <li>South Hall 위치 = 근사(OpenStreetMap에 이름 없음)</li>
+      <li>Tech Express 토요일 운행 — 시간표에는 토 7:30–16:30이 있으나 본문은 "Monday through Friday"</li>
+      <li>"LVCC 역 4곳"이 지도의 어느 Loop 역인지(지도에는 OSM에 있는 Loop 역 전부 표시)</li>
+    </ul>
+
+    <h2>출처</h2>
+    <ul class="note">
+      <li>CES 2027 Complimentary Transportation(2026-10-05 판), Las Vegas City View(As of September 29, 2026) — ces.tech/media/02tnll0c/final-ces-2027-transportation-flyer-10-5.pdf</li>
+      <li>좌표: OpenStreetMap(Nominatim·Overpass), 2026-11-12 조회</li>
+      <li>배경 지도: U.S. Geological Survey, The National Map(USGSTopo·USGSImageryTopo, 미국 공공 영역) — basemap.nationalmap.gov, 2026-11-13 교체</li>
+    </ul>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+  var C = {teal:'#0F6E56', purple:'#534AB7', gray:'#5F5E5A', mono:'#A32D2D', te:'#BA7517', loop:'#185FA5', cs:'#3B6D11'};
+  var map = L.map('map', {zoomControl:true});
+  // Base map tiles: USGS The National Map (U.S. public domain, no key, works from a local file)
+  var usgsTopo = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 16, maxZoom: 19,
+    attribution: '지도: USGS The National Map'
+  });
+  var usgsImg = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 16, maxZoom: 19,
+    attribution: '지도: USGS The National Map (항공사진)'
+  });
+  usgsTopo.addTo(map);
+  L.control.layers({'일반 지도': usgsTopo, '항공사진': usgsImg}, null, {position:'topright'}).addTo(map);
+  L.control.scale({imperial:false}).addTo(map);
+
+  function pt(lat, lon, color, r, label, dir, cls, fill){
+    var m = L.circleMarker([lat, lon], {radius:r, color:color, weight:2, fillColor:fill||color, fillOpacity:0.9}).addTo(map);
+    if(label){ m.bindTooltip(label, {permanent:true, direction:dir||'right', className:'lbl '+(cls||''), offset:[dir==='left'?-6:(dir==='right'?6:0), dir==='top'?-6:(dir==='bottom'?6:0)]}); }
+    return m;
+  }
+  function zone(lat, lon, radius, label){
+    L.circle([lat, lon], {radius:radius, color:'#A32D2D', weight:1.5, dashArray:'6 6', fill:false}).addTo(map);
+    L.tooltip({permanent:true, direction:'center', className:'lbl zone'}).setLatLng([lat + radius/111000*0.82, lon]).setContent(label).addTo(map);
+  }
+
+  // Zones (circle positions follow the official CES City View map)
+  zone(36.1322, -115.1535, 820, 'LVCC 캠퍼스');
+  zone(36.1250, -115.1660, 640, 'Venetian 캠퍼스');
+  zone(36.1070, -115.1772, 380, 'C Space 캠퍼스');
+
+  // LVCC halls
+  pt(36.13383, -115.15727, C.teal, 9, 'West Hall · Xpanner 4569', 'top', 'xp');
+  pt(36.13293, -115.15273, C.purple, 7, 'North Hall', 'top', 'hall');
+  pt(36.13128, -115.15027, C.purple, 7, 'Central Hall', 'right', 'hall');
+  pt(36.12870, -115.14950, C.purple, 7, 'South Hall (위치 근사)', 'bottom', 'hall', '#FFFFFF');
+
+  // Hotels and other venues
+  pt(36.13742, -115.15923, C.gray, 7, 'Fontainebleau · CES Foundry', 'left');
+  pt(36.13566, -115.15134, C.gray, 6, 'Westgate', 'right');
+  pt(36.13369, -115.16616, C.gray, 6, 'Resorts World', 'left');
+  pt(36.12944, -115.16488, C.gray, 6, 'Encore', 'right');
+  pt(36.12662, -115.16540, C.gray, 6, 'Wynn', 'right');
+  pt(36.12418, -115.16827, C.gray, 6, 'Palazzo', 'left');
+  pt(36.12171, -115.16934, C.gray, 6, 'Venetian', 'left');
+  pt(36.12191, -115.16623, C.purple, 8, 'Venetian Expo · Eureka Park · TE·CS·호텔 셔틀', 'bottom', 'hall');
+  pt(36.10703, -115.17800, C.cs, 8, 'ARIA · C Space', 'left');
+
+  // Monorail (station-to-station line; track shape simplified)
+  var mono = [
+    [36.14235, -115.15461, 'SAHARA'],
+    [36.13713, -115.15297, 'Westgate역'],
+    [36.12938, -115.15434, '모노레일 LVCC역 · TE 승차'],
+    [36.11881, -115.16852, "Harrah's/LINQ"],
+    [36.11603, -115.16857, 'Flamingo/Caesars'],
+    [36.11222, -115.16748, 'Horseshoe/Paris'],
+    [36.10264, -115.16778, 'MGM Grand']
+  ];
+  L.polyline(mono.map(function(s){return [s[0], s[1]];}), {color:C.mono, weight:4, opacity:0.8}).addTo(map);
+  mono.forEach(function(s, i){
+    var dir = (i === 2) ? 'top' : 'right';
+    pt(s[0], s[1], C.mono, 5, (i===2 ? '' : 'M ') + s[2], dir, (i===2 ? 'st keep' : 'st'), '#FFFFFF');
+  });
+
+  // Vegas Loop stations (OpenStreetMap, operator The Boring Company)
+  var loop = [
+    [36.13321, -115.15999, 'Loop West'],
+    [36.13083, -115.15333, ''],
+    [36.13134, -115.15297, ''],
+    [36.12839, -115.14656, 'Loop South'],
+    [36.13588, -115.15965, 'Loop Riviera'],
+    [36.13663, -115.15774, ''],
+    [36.13356, -115.16582, ''],
+    [36.12922, -115.16321, 'Loop Encore'],
+    [36.13586, -115.15269, ''],
+    [36.14194, -115.15528, '']
+  ];
+  loop.forEach(function(s){
+    L.circleMarker([s[0], s[1]], {radius:4, color:C.loop, weight:1.5, fillColor:C.loop, fillOpacity:1}).addTo(map)
+      .bindTooltip(s[2] || 'Vegas Loop 역', {permanent: !!s[2], direction:'bottom', className:'lbl st', offset:[0,4]});
+  });
+
+  // Tech Express (simplified straight path)
+  var teA = [36.12938, -115.15434], teB = [36.12191, -115.16623];
+  L.polyline([teA, teB], {color:C.te, weight:4, dashArray:'8 6'}).addTo(map);
+
+  // C Space shuttle (simplified)
+  L.polyline([[36.12191, -115.16623], [36.10703, -115.17800]], {color:C.cs, weight:3, dashArray:'2 6'}).addTo(map);
+  L.polyline([[36.13383, -115.15727], [36.10703, -115.17800]], {color:C.cs, weight:2, dashArray:'2 6', opacity:0.6}).addTo(map);
+
+  // Straight-line distances
+  var D = [
+    ['West Hall ↔ Central Hall', [36.13383, -115.15727], [36.13128, -115.15027]],
+    ['West Hall ↔ Fontainebleau', [36.13383, -115.15727], [36.13742, -115.15923]],
+    ['LVCC역(Tech Express) ↔ Venetian Expo', teA, teB],
+    ['West Hall ↔ Venetian Expo', [36.13383, -115.15727], [36.12191, -115.16623]],
+    ['Venetian Expo ↔ ARIA(C Space)', [36.12191, -115.16623], [36.10703, -115.17800]]
+  ];
+  var list = document.getElementById('distList');
+  D.forEach(function(d, i){
+    var km = map.distance(d[1], d[2]) / 1000;
+    var li = document.createElement('li');
+    li.textContent = d[0] + ' — 약 ' + km.toFixed(2) + ' km';
+    list.appendChild(li);
+    if(i === 0 || i === 1 || i === 2 || i === 4){
+      var mid = [(d[1][0] + d[2][0]) / 2, (d[1][1] + d[2][1]) / 2];
+      L.tooltip({permanent:true, direction:'center', className:'lbl dist'}).setLatLng(mid).setContent(km.toFixed(2) + ' km').addTo(map);
+    }
+  });
+
+  var views = {
+    lvcc: L.latLngBounds([[36.1270, -115.1630], [36.1395, -115.1450]]),
+    ven:  L.latLngBounds([[36.1195, -115.1720], [36.1310, -115.1580]]),
+    all:  L.latLngBounds([[36.1020, -115.1820], [36.1430, -115.1450]])
+  };
+  function zoomClass(){ map.getContainer().classList.toggle('z-lo', map.getZoom() < 15); }
+  map.on('zoomend', zoomClass);
+  map.setView([36.1225, -115.1635], 14);
+  zoomClass();
+  function fitAll(){ map.invalidateSize(); map.fitBounds(views.all, {padding:[10,10]}); }
+  setTimeout(fitAll, 150);
+  window.addEventListener('load', fitAll);
+  document.querySelectorAll('.btns button').forEach(function(b){
+    b.addEventListener('click', function(){ map.fitBounds(views[b.getAttribute('data-view')], {padding:[10,10]}); });
+  });
+})();
+</script>
+</body>
+</html>
